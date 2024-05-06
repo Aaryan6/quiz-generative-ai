@@ -1,8 +1,4 @@
-import { UIState } from "@/app/actions";
-import { cn } from "@/lib/utils";
-import { Bot, User } from "lucide-react";
-
-export function ChatList({ messages }: { messages: UIState[] }) {
+export function ChatList({ messages }: { messages: any[] }) {
   if (!messages.length) {
     return null;
   }

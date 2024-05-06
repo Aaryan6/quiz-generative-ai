@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { useActions, useUIState } from "ai/rsc";
-import { AI } from "@/app/actions";
+import { AI, UIState } from "@/app/actions";
 import { MemoizedReactMarkdown } from "../markdown";
 import { UserMessage } from "../message";
 import { Button } from "../ui/button";
@@ -22,21 +22,32 @@ export default function QuizQuestion({
   const { submitAnswer } = useActions<typeof AI>();
   const isMultipleChoice = questionType === "multiple-options";
 
+  let options = possibleAnswers;
+
+  console.log(possibleAnswers);
+
+  if (typeof options === "object" && Object.keys(options).length > 0) {
+    options = Object.keys(options).map((key) => options[key]);
+    console.log(options);
+  }
+
   const handleOption = (value: any) => {
     setSelectedOption(value);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(selectedOption);
     if (!isMultipleChoice && !selectedOption) {
       console.log("no options selected!");
       return;
     }
     // Add user message UI
-    setMessages((currentMessages: any[]) => [
+    setMessages((currentMessages: UIState[]) => [
       ...currentMessages,
       {
         id: nanoid(),
+        role: "user",
         display: (
           <UserMessage>{`My answer is: "${selectedOption}"`}</UserMessage>
         ),
@@ -45,7 +56,6 @@ export default function QuizQuestion({
 
     // @ts-ignore
     const response = await submitAnswer(selectedOption);
-    console.log(response);
     setAnswerUI(response.answerUI);
     // Insert a new system message to the UI.
     setMessages((currentMessages: any[]) => [
@@ -62,7 +72,7 @@ export default function QuizQuestion({
       <form onSubmit={handleSubmit} className="w-full">
         <div className="p-2 flex flex-col">
           {/* @ts-ignore */}
-          {possibleAnswers.map((option: any, index) => (
+          {options.map((option: any, index) => (
             <Button
               variant={"ghost"}
               disabled={answerUI}
@@ -75,6 +85,7 @@ export default function QuizQuestion({
               name={`option_${index}`}
               value={selectedOption}
               onClick={() => handleOption(option)}
+              type="submit"
             >
               <MemoizedReactMarkdown>{option}</MemoizedReactMarkdown>
             </Button>

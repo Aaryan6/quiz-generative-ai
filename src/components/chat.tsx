@@ -26,6 +26,8 @@ export const Chat = () => {
     setInputValue("");
     if (!value) return;
 
+    console.log(value);
+
     // Add user message UI
     setConversation((currentConversation: UIState[]) => [
       ...currentConversation,
@@ -39,7 +41,9 @@ export const Chat = () => {
     try {
       // Submit and get response message
       const response = await sendMessage(value);
-      setConversation((currentConversation: UIState[]) => [
+
+      console.log(response);
+      setConversation((currentConversation: any[]) => [
         ...currentConversation,
         response,
       ]);
@@ -84,31 +88,32 @@ export const Chat = () => {
           <div className="mx-auto w-full max-w-2xl flex justify-center px-4">
             <Button
               variant={"outline"}
-              // onClick={async () => {
-              //   setMessages((currentMessages: any[]) => [
-              //     ...currentMessages,
-              //     {
-              //       id: nanoid(),
-              //       display: (
-              //         <UserMessage>
-              //           Quiz me about chess with multiple choice questions.
-              //         </UserMessage>
-              //       ),
-              //     },
-              //   ]);
+              onClick={async () => {
+                setConversation((currentConversation: any[]) => [
+                  ...currentConversation,
+                  {
+                    id: nanoid(),
+                    role: "user",
+                    display: (
+                      <UserMessage>
+                        Quiz me about chess with multiple choice questions.
+                      </UserMessage>
+                    ),
+                  },
+                ]);
 
-              //   try {
-              //     const responseMessage = await submitUserMessage(
-              //       "Quiz me about chess with multiple choice questions."
-              //     );
-              //     setMessages((currentMessages: any[]) => [
-              //       ...currentMessages,
-              //       responseMessage,
-              //     ]);
-              //   } catch (error) {
-              //     console.error(error);
-              //   }
-              // }}
+                try {
+                  const responseMessage = await sendMessage(
+                    "Quiz me about chess with multiple choice questions."
+                  );
+                  setConversation((currentConversation: any[]) => [
+                    ...currentConversation,
+                    responseMessage,
+                  ]);
+                } catch (error) {
+                  console.error(error);
+                }
+              }}
               className="text-center mx-auto py-8 sm:py-6 text-wrap space-x-2"
             >
               <ArrowUpRight size={18} className="" />
