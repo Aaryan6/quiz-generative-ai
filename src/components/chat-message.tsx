@@ -1,27 +1,32 @@
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-
 import { cn } from "@/lib/utils";
-import { MemoizedReactMarkdown } from "@/components/markdown";
+import { UIState } from "@/app/actions";
+import { useEffect, useRef } from "react";
 
 export interface ChatMessageProps {
-  message: any;
+  messages: UIState;
+  aiState: any;
 }
 
-export function ChatMessage({ message, ...props }: ChatMessageProps) {
+export function ChatMessage({ messages, aiState }: ChatMessageProps) {
+  const bottomScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomScrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, aiState?.messages]);
   return (
     <div
-      className={cn("group relative mb-4 flex items-start md:-ml-12")}
-      {...props}
+      className={cn(
+        "mb-4 flex flex-col gap-4 max-w-3xl mx-auto pt-10 overflow-y-auto"
+      )}
     >
-      <div className="flex-1 px-1 ml-4 space-y-2 overflow-hidden">
-        <MemoizedReactMarkdown
-          className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
-          remarkPlugins={[remarkGfm, remarkMath]}
-        >
-          {message}
-        </MemoizedReactMarkdown>
-      </div>
+      {messages.map((message, index: number) => {
+        return (
+          <div className="" key={message.id ?? index}>
+            {message.component}
+          </div>
+        );
+      })}
+      <div ref={bottomScrollRef} className="pb-12" />
     </div>
   );
 }
